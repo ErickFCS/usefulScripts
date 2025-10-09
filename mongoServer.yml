@@ -1,0 +1,12 @@
+services:
+  mongodb:
+    image: mongo:7.0      # Use the latest stable version
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"     # Expose MongoDB on localhost
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: f15Lo0ky8vG
+    volumes:
+      - /var/lib/mongodb:/data/db   # Bind mount host path to container data path
