@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Download foundry installer `foundryup`
+curl -L https://foundry.paradigm.xyz | bash
+# Install forge, cast, anvil, chisel
+foundryup
+# Install the latest nightly release
+foundryup -i nightly
