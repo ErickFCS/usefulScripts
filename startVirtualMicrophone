@@ -1,0 +1,5 @@
+#!/bin/bash
+
+
+pactl load-module module-null-sink sink_name=obs_virtual_mic sink_properties=device.description="OBS_Virtual_Mic"
+pactl load-module module-loopback source=obs_virtual_mic.monitor latency_msec=20
