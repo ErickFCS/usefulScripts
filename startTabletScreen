@@ -1,0 +1,3 @@
+#!/bin/bash
+
+krfb-virtualmonitor --name "TabletScreen" --resolution 1280x800 --port 5900 --password "mypassword"
