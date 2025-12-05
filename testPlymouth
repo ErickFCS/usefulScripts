@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sudo plymouthd --mode=boot --pid-file=/tmp/plymouth.pid
+sudo plymouth --show-splash
+sleep 5
+sudo plymouth --quit
