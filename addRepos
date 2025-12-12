@@ -1,0 +1,4 @@
+#!/bin/bash
+
+
+sudo sed -i 's/main/main contrib non-free/g' /etc/apt/sources.list.d/debian.sources
