@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rclone mount GoogleDrive: ~/GoogleDrive --vfs-cache-mode writes &
+disown %1

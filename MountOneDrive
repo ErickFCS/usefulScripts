@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rclone mount OneDrive: ~/OneDrive --vfs-cache-mode writes &
+disown %1
