@@ -1,0 +1,45 @@
+#!/bin/bash
+
+
+create() {
+  name="virtual_monitor"
+  res="1440x832"
+  pass="password"
+  port="5900"
+  if [[ -n $1 ]] then
+    name=$1
+  fi
+  if [[ -n $2 ]] then
+    res=$2
+  fi
+  if [[ -n $3 ]] then
+    pass=$3
+  fi
+  if [[ -n $4 ]] then
+    port=$4
+  fi
+
+  krfb-virtualmonitor --name "$name" --resolution "$res" --password "$pass" --port "$port"
+}
+
+phonev() {
+  create "phone_screen" 736x1600 "password" 5900
+}
+
+phoneh() {
+  create "phone_screen" 1600x736 "password" 5900
+}
+
+tablet() {
+  create "tablet_screen" 1280x800 "password" 5900
+}
+
+
+if [[ -z $1 ]]; then
+  create
+elif declare -F $1 > /dev/null; then
+  $@
+else
+  echo "$1 is not a valid command"
+  exit 1
+fi
