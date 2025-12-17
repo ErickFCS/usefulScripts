@@ -1,0 +1,10 @@
+#!/bin/bash
+
+sed -i 's/stylistic\/js\//stylistic\//g' ./eslint.config.js
+sed -i 's/stylisticJs/stylistic/g' ./eslint.config.js
+sed -i 's/@stylistic\/eslint-plugin-js/@stylistic\/eslint-plugin/g' ./eslint.config.js
+
+pnpm up -L
+pnpm remove @stylistic/eslint-plugin-js
+pnpm add @stylistic/eslint-plugin
+
