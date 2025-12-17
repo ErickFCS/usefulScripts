@@ -1,0 +1,29 @@
+#!/bin/bash
+
+
+set() {
+  sudo groupadd -r uinput
+  sudo usermod -aG uinput $USER
+  echo 'KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"' \
+    | sudo tee /etc/udev/rules.d/60-weylus.rules
+  sudo apt update && sudo apt install gstreamer1.0-pipewire gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+}
+
+load() {
+  sudo udevadm control --reload
+  sudo udevadm trigger
+}
+
+undo() {
+  sudo rm /etc/udev/rules.d/60-weylus.rules
+  sudo apt purge gstreamer1.0-pipewire 
+}
+
+if [[ -z $1 ]]; then
+  set
+elif declare -F "$1" > /dev/null; then
+  "$@"
+else
+  echo "$1 is not a valid command"
+  exit 1
+fi
