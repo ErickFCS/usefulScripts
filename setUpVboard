@@ -1,0 +1,36 @@
+#!/bin/bash
+
+
+setUp() {
+  sudo apt install python3-uinput steam-devices
+  cd /opt/oneFileApps/
+  sudo wget https://github.com/mdev588/vboard/releases/download/v1.21/vboard.py
+  echo "#!/usr/bin/python3" | sudo tee vboard
+  cat vboard.sh >> vboard
+  sudo rm vboard.sh
+  cat > ~/.local/share/applications/vboard.desktop << EOF
+[Desktop Entry]
+Exec=/opt/oneFileApps/vboard
+Icon=preferences-desktop-keyboard
+Name=Vboard
+Terminal=false
+Type=Application
+Categories=Utility
+NoDisplay=false
+EOF
+}
+
+undo() {
+  sudo apt purge python3-uinput steam-devices
+  sudo rm /opt/oneFileApps/vboard
+  sudo rm ~/.local/share/applications/vboard.desktop
+}
+
+if [[ -z $1 ]]; then
+  setUp
+elif declare -F "$1" > /dev/null; then
+  "$@"
+else
+  echo "$1 is not a valid command"
+  exit 1
+fi
