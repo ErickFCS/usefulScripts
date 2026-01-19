@@ -1,4 +1,11 @@
 #!/bin/bash
 
-rclone mount GoogleDrive: ~/GoogleDrive --vfs-cache-mode writes &
+rclone mount GoogleDrive: ~/GoogleDrive \
+  --buffer-size 128M \
+  --dir-cache-time 120h \
+  --vfs-cache-max-age 12h \
+  --vfs-cache-max-size 5G \
+  --vfs-fast-fingerprint \
+  --vfs-read-ahead 256M \
+  --vfs-cache-mode full &
 disown %1
