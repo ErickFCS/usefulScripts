@@ -1,0 +1,30 @@
+#!/bin/bash
+
+setUp() {
+  sudo apt update && sudo apt install systemd-resolved
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now systemd-resolved
+  sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+  resolvectl status
+}
+
+undo() {
+  sudo systemctl stop --now systemd-resolved
+  sudo systemctl disable --now systemd-resolved
+  sudo apt purge systemd-resolved
+  sudo rm -fr /etc/resolv.conf
+  sudo cat > /etc/resolv.conf << EOF
+  nameserver 1.1.1.1
+  nameserver 1.0.0.1
+  nameserver 8.8.8.8
+  EOF
+}
+
+if [[ -z $1 ]]; then
+  setUp
+elif declare -F "$1" > /dev/null; then
+  "$@"
+else
+  echo "$1 is not a valid command"
+  exit 1
+fi
