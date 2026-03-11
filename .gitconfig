@@ -1,0 +1,33 @@
+# This is Git's per-user configuration file.
+[user]
+	name = Erick Fernando Carvalho Sanchez
+	email = carvalhosanchezerickfernando@gmail.com
+	signingkey = /home/erick/.ssh/keys/ErickFCS
+[core]
+  autocrlf = false
+  filemod = true
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[color]
+  ui = auto
+[push]
+  default = current
+[commit]
+  gpgsign = true
+[alias]
+  co = checkout
+  cm = commit
+  st = status
+  br = branch
+  rb = rebase
+  mg = merge
+  lg = log --graph --all --decorate --oneline
+[gpg]
+	format = ssh
