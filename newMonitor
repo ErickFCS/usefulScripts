@@ -1,0 +1,10 @@
+#!/bin/bash
+
+for p in /sys/class/drm/*/status; do echo -n "$p: "; cat $p; done
+
+cat /sys/class/drm/card0-HDMI-A-1/edid > ~/virtual_monitor.bin
+sudo mkdir -p /lib/firmware/edid
+sudo cp ~/virtual_monitor.bin /lib/firmware/edid/
+# added 
+# drm.edid_firmware=DP-1:edid/virtual_monitor.bin video=DP-1:e
+# to the /etc/default/grub default line file
