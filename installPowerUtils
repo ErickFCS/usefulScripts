@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# My Modern Unix Power Utils
+TOOLS=(
+  "ripgrep"   # Fast search (rg)
+  "bat"       # Cat with wings (syntax highlighting)
+  "fd-find"   # Fast find (fdfind)
+  "zoxide"    # Smarter cd (z)
+  "eza"       # Better ls
+  "hyperfine" # Best time to watch programs
+  "hexyl"     # Best hex editor with colors
+  "rnr"       # Best rename utility
+  "cargo-binstall"  # Download precompiled binaries
+)
+
+
+if [[ "$1" == "compile" ]]; then
+  cargo install ${TOOLS[@]}
+  cargo clean
+elif [[ "$1" == "download" ]]; then
+  cargo install cargo-binstall
+  cargo binstall ${TOOLS[@]}
+elif [[ "$1" == "undo" ]]; then
+  cargo uninstall ${TOOLS[@]}
+else
+  echo "$1 is invalid"
+  echo "Use one of: compile | download | undo"
+fi
