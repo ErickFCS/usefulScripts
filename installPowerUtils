@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# My Modern Unix Power Utils
+TOOLS=(
+  "ripgrep"   # Fast search (rg)
+  "fzf"       # Fuzzy finder
+  "bat"       # Cat with wings (syntax highlighting)
+  "fd-find"   # Fast find (fdfind)
+  "zoxide"    # Smarter cd (z)
+  "eza"       # Better ls
+  "hyperfine" # Best time to watch programs
+  "hexyl"     # Best hex editor with colors
+  "rnr"       # Best rename utility
+)
+
+cargo install $(TOOLS[@])
