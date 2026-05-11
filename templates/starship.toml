@@ -1,0 +1,55 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts for readability
+add_newline = true
+
+# The order of modules in the prompt
+format = """
+$os\
+$directory\
+$git_branch\
+$git_status\
+$c\
+$python\
+$lua\
+$line_break\
+$character"""
+
+[directory]
+style = "bold cyan"
+truncation_length = 3
+fish_style_pwd_dir_length = 1 # Turns /home/user/projects into ~/u/projects
+read_only = " 󰌾"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+[git_branch]
+symbol = " "
+style = "bold purple"
+
+[git_status]
+style = "bold red"
+format = '([\[$all_status$ahead_behind\]]($style) )'
+
+[cmd_duration]
+min_time = 500
+format = "took [$duration]($style) "
+
+[os]
+disabled = false
+format = "[$symbol]($style) "
+
+[os.symbols]
+Debian = ""
+
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[azure]
+disabled = true
