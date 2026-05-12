@@ -3,31 +3,57 @@
 	name = Erick Fernando Carvalho Sanchez
 	email = carvalhosanchezerickfernando@gmail.com
 	signingkey = /home/erick/.ssh/keys/ErickFCS
+
 [core]
   autocrlf = false
   filemod = true
-[init]
-	defaultBranch = main
-[pull]
-	rebase = true
+
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+
 [color]
   ui = auto
-[push]
-  default = current
-[commit]
-  gpgsign = true
+[pretty]
+  base = "%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"
+  withDatetime = "%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)%n %C(bold cyan)%aD%C(reset)"
 [alias]
-  co = checkout
-  cm = commit
-  st = status
-  br = branch
-  rb = rebase
-  mg = merge
-  lg = log --graph --all --decorate --oneline
+  ch = checkout
+  sw = switch
+  a = add
+  c = commit
+  s = status
+  b = branch
+  r = rebase
+  m = merge
+  lc = "log --graph --all  --oneline"
+  l =  "log --graph --all  --format=base"
+  ldt = "log --graph --all  --format=withDatetime"
+  lb = "log --graph --stat --format=base"
+  rw = restore -W
+  rs = restore -S
+
+[init]
+	defaultBranch = main
 [gpg]
 	format = ssh
+[commit]
+  gpgsign = true
+[diff]
+  algorithm = histogram
+  renames = true
+[merge]
+  conflictstyle = zdiff3
+[rebase]
+  autostash = true
+[push]
+  default = current
+[pull]
+	rebase = true
+[checkout]
+  workers = 0 # This makes checkout use all my cpu cores 
+
+[rerere]
+  enabled = true # This remembers my conflict fix iff repeated
