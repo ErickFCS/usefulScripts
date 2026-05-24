@@ -28,12 +28,23 @@
   b = branch
   r = rebase
   m = merge
+  p = pull
+  f = fetch
   lc = "log --graph --all  --oneline"
   l =  "log --graph --all  --format=base"
   ldt = "log --graph --all  --format=withDatetime"
   lb = "log --graph --stat --format=base"
   rw = restore -W
   rs = restore -S
+  ff-all = !"git fetch --all && \
+    cur=$(git branch --show-current) && \
+    for b in $(git for-each-ref refs/heads --format='%(refname:short)'); do \
+        if [ \"$b\" = \"$cur\" ]; then \
+            echo \"Updating active branch $cur...\" && git pull --ff-only; \
+        else \
+            echo \"Fast-forwarding $b...\" && git fetch . \"refs/remotes/origin/$b:$b\" 2>/dev/null || echo \"  -> Skipped $b (diverged or no upstream)\"; \
+        fi; \
+    done"
 
 [init]
 	defaultBranch = main
