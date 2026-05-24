@@ -1,0 +1,51 @@
+#!/bin/bash
+
+vmName="win11"
+qemuHook="./static/etc_libvirt_hooks_qemu"
+compilePath="/tmp/vbios"
+
+setUp() {
+  sudo mkdir -p /etc/libvirt/hooks/qemu.d/$vmName/prepare/begin
+  sudo cp -f ./static/start_vm.sh /etc/libvirt/hooks/qemu.d/$vmName/prepare/begin/start.sh
+  sudo mkdir -p /etc/libvirt/hooks/qemu.d/$vmName/release/end
+  sudo cp -f ./static/revert_vm.sh /etc/libvirt/hooks/qemu.d/$vmName/release/end/revert.sh
+  sudo cp -f "$qemuHook" /etc/libvirt/hooks/qemu
+
+  sudo mkdir -p /tmp/vbios
+  sudo cp ./static/vbios.c "$compilePath"/
+  pushd "$compilePath"
+  sudo gcc vbios.c -o vbios
+  sudo ./vbios
+  popd
+  sudo mkdir -p /var/lib/libvirt/vbios
+  sudo mv "$compilePath"/*.bin /var/lib/libvirt/vbios/
+  sudo chown -R libvirt-qemu:libvirt-qemu /var/lib/libvirt/vbios/
+  sudo chmod 755 /var/lib/libvirt/vbios/
+  sudo chmod 444 /var/lib/libvirt/vbios/*
+
+  echo Hay que agregar /var/lib/libvirt/vbios/** rk, al archivo /etc/apparmor.d/abstractions/libvirt-qemu
+  read
+  sudo systemctl restart apparmor
+  sudo systemctl restart libvirtd
+}
+
+undo() {
+  sudo rm -fr /etc/libvirt/hooks/qemu.d/$vmName/prepare/begin
+  sudo rm -fr /etc/libvirt/hooks/qemu.d/$vmName/release/end
+  sudo rm -fr /etc/libvirt/hooks/qemu
+  sudo rm -fr /var/lib/libvirt/vbios
+  sudo rm -fr "$compilePath"
+  echo Hay que eliminar /var/lib/libvirt/vbios/** rk, al archivo /etc/apparmor.d/abstractions/libvirt-qemu
+  read
+  sudo systemctl restart apparmor
+  sudo systemctl restart libvirtd
+}
+
+if [[ -z $1 ]]; then
+  setUp
+elif declare -F "$1" > /dev/null; then
+  "$@"
+else
+  echo "$1 is not a valid command"
+  exit 1
+fi
