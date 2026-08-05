@@ -1,0 +1,13 @@
+#!/bin/bash
+
+sudo -b ydotoold
+sleep 5
+export YDOTOOL_SOCKET="/tmp/.ydotool_socket"
+# Prompt for password silently
+IFS= read -rsp "Remote Desktop Password: " PASSWORD
+echo "" 
+sudo ydotool type "$PASSWORD"
+sudo ydotool key 28:1 28:0
+unset PASSWORD
+sudo pkill -f "ydotoold"
+echo "Login command sent."
