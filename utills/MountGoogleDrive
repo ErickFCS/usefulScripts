@@ -7,5 +7,7 @@ rclone mount GoogleDrive: ~/GoogleDrive \
   --vfs-cache-max-size 5G \
   --vfs-fast-fingerprint \
   --vfs-read-ahead 256M \
-  --vfs-cache-mode full &
+  --vfs-cache-mode full \
+  --rc \
+  --rc-no-auth &
 disown %1

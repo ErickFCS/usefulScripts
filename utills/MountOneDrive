@@ -7,5 +7,7 @@ rclone mount OneDrive: ~/OneDrive \
   --vfs-cache-max-size 5G \
   --vfs-fast-fingerprint \
   --vfs-read-ahead 256M \
-  --vfs-cache-mode writes &
+  --vfs-cache-mode writes \
+  --rc \
+  --rc-no-auth &
 disown %1
