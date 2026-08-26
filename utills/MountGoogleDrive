@@ -1,13 +1,19 @@
 #!/bin/bash
 
+mkdir -p ~/GoogleDrive
+
 rclone mount GoogleDrive: ~/GoogleDrive \
   --buffer-size 128M \
   --dir-cache-time 120h \
+  --drive-chunk-size 128M \
+  --poll-interval 1m \
+  --rc \
+  --rc-no-auth \
   --vfs-cache-max-age 12h \
   --vfs-cache-max-size 5G \
+  --vfs-cache-mode full \
+  --vfs-cache-poll-interval 1m \
   --vfs-fast-fingerprint \
   --vfs-read-ahead 256M \
-  --vfs-cache-mode full \
-  --rc \
-  --rc-no-auth &
-disown %1
+  > /dev/null 2>&1 \
+  & disown
