@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sudo dnf install qemu-kvm libvirt virt-manager virt-install bridge-utils
+
+sudo usermod -aG kvm $USER
+sudo usermod -aG libvirt $USER
