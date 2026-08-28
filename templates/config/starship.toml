@@ -40,10 +40,11 @@ format = "took [$duration]($style) "
 
 [os]
 disabled = false
-format = "[$symbol]($style) "
+format = "$symbol "
 
 [os.symbols]
-Debian = ""
+Debian = "[](bold red)"
+Fedora = "[](bold blue)"
 
 [aws]
 disabled = true
