@@ -6,7 +6,8 @@
 
 [core]
   autocrlf = false
-  filemod = true
+  commentString = "#"
+  fileMode = true
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
@@ -26,17 +27,120 @@
   c = commit
   s = status
   b = branch
+  t = tag
   r = rebase
   m = merge
   p = pull
   f = fetch
-  lc = "log --graph --all  --oneline"
-  l =  "log --graph --all  --format=base"
-  ldt = "log --graph --all  --format=withDatetime"
-  lb = "log --graph --stat --format=base"
+
   rw = restore -W
   rs = restore -S
-  ff-all = !"git fetch --all && \
+
+  lg = "log --graph"
+  lgb = "lg --format=base"
+  lgdt = "lg --format=withDatetime"
+
+  llv = "lg --oneline"
+  ll = "lgb"
+  lldt = "lgdt"
+  llb = "lgb --stat"
+
+  lv = "llv --all"
+  l = "ll --all"
+  ldt = "lldt --all"
+  lb = "llb --all"
+
+  llcv = "llv --first-parent"
+  llc = "ll --first-parent"
+  llcdt = "lldt --first-parent"
+  lbc = "lb --first-parent"
+
+  lcv = "lv --first-parent"
+  lc = "l --first-parent"
+  lcdt = "ldt --first-parent"
+  lcb = "lb --first-parent"
+
+  ls = "ls-files"
+  skip = "update-index --skip-worktree"
+  unskip = "update-index --no-skip-worktree"
+  skipped = "!git ls-files -v | grep '^S'"
+
+  edit-ignore = "!${EDITOR:-vi} \"$(git rev-parse --git-path info/exclude)\""
+
+  ignore = "!f() { \
+    [ -n \"$1\" ] || { echo \"Usage: git ignore <pattern> [...]\"; return 1; }; \
+    exclude=\"$(git rev-parse --git-path info/exclude)\"; \
+    for pattern in \"$@\"; do \
+      grep -Fxq \"$pattern\" \"$exclude\" 2>/dev/null || { \
+        echo \"$pattern\" >> \"$exclude\"; \
+        echo \"$pattern added\"; \
+      }; \
+    done; \
+  }; f"
+
+  unignore = "!f() { \
+    [ -n \"$1\" ] || { echo \"Usage: git unignore <pattern> [...]\"; return 1; }; \
+    exclude=\"$(git rev-parse --git-path info/exclude)\"; \
+    [ -f \"$exclude\" ] || return 0; \
+    for pattern in \"$@\"; do \
+      grep -Fvx \"$pattern\" \"$exclude\" > \"$exclude.tmp\" && mv \"$exclude.tmp\" \"$exclude\"; \
+      echo \"$pattern removed\"; \
+    done; \
+  }; f"
+
+  ignored = "!cat \"$(git rev-parse --git-path info/exclude)\""
+
+  load-skipfile = "!f() { \
+    if [ -z \"$1\" ]; then \
+      echo \"Usage: git load-skipfile <skipfile>\"; \
+      return 1; \
+    fi; \
+    if [ ! -f \"$1\" ]; then \
+      echo \"Skipfile $1 not found.\"; \
+      return 1; \
+    fi; \
+    while IFS= read -r line || [ -n \"$line\" ]; do \
+      line=$(printf '%s' \"$line\" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'); \
+      case \"$line\" in \
+        ''|'#'*) continue ;; \
+      esac; \
+      matches=$(git ls-files -- \"$line\"); \
+      if [ -z \"$matches\" ]; then \
+        echo \"$line ignored\"; \
+        continue; \
+      fi; \
+      printf '%s\n' \"$matches\" | while IFS= read -r path; do \
+        git skip \"$path\"; \
+      done; \
+    done < \"$1\"; \
+  }; f"
+
+  unload-skipfile = "!f() { \
+    if [ -z \"$1\" ]; then \
+      echo \"Usage: git unload-skipfile <skipfile>\"; \
+      return 1; \
+    fi; \
+    if [ ! -f \"$1\" ]; then \
+      echo \"Skipfile $1 not found.\"; \
+      return 1; \
+    fi; \
+    while IFS= read -r line || [ -n \"$line\" ]; do \
+      line=$(printf '%s' \"$line\" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'); \
+      case \"$line\" in \
+        ''|'#'*) continue ;; \
+      esac; \
+      matches=$(git ls-files -- \"$line\"); \
+      if [ -z \"$matches\" ]; then \
+        echo \"$line ignored\"; \
+        continue; \
+      fi; \
+      printf '%s\n' \"$matches\" | while IFS= read -r path; do \
+        git unskip \"$path\"; \
+      done; \
+    done < \"$1\"; \
+  }; f"
+
+  ff-all = "!git fetch --all && \
     cur=$(git branch --show-current) && \
     for b in $(git for-each-ref refs/heads --format='%(refname:short)'); do \
         if [ \"$b\" = \"$cur\" ]; then \
@@ -64,7 +168,6 @@
 [pull]
 	rebase = true
 [checkout]
-  workers = 0 # This makes checkout use all my cpu cores 
-
+  workers = 0
 [rerere]
-  enabled = true # This remembers my conflict fix iff repeated
+  enabled = true
