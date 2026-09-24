@@ -5,54 +5,100 @@ alias lla='ls -lA'
 alias l='ls -CF'
 alias reload='. ~/.bashrc'
 
+setpass() {
+  local pass1 pass2
+
+  read -s -p "Enter session password: " pass1
+  echo
+  read -s -p "Confirm session password: " pass2
+  echo
+
+  if [[ "$pass1" != "$pass2" ]]; then
+    echo "Error: Passwords do not match. Password not set." >&2
+    return 1
+  fi
+
+  export password="$pass1"
+  echo "Password successfully stored in \$password for this session."
+}
+export -f setpass
+
 function enc() {
-  echo "$1" | openssl enc -aes-256-cbc -pbkdf2 -a -A -pass pass:"${password:=''}" -nosalt | tr '/+' '_-'
+  local input
+  if [[ -t 0 ]]; then
+    input="$1"
+  else
+    input="$(cat)"
+  fi
+  printf '%s\n' "$input" | openssl enc -aes-256-cbc -pbkdf2 -a -A -pass pass:"${password:=''}" -nosalt | tr '/+' '_-'
   echo
 }
 export -f enc
 
 function dec() {
-  echo "$1" | tr '_-' '/+' | openssl enc -d -aes-256-cbc -pbkdf2 -a -A -pass pass:"${password:=''}" -nosalt 2>/dev/null
+  local input
+  if [[ -t 0 ]]; then
+    input="$1"
+  else
+    input="$(cat)"
+  fi
+  local output
+  output="$(printf '%s\n' "$input" | tr '_-' '/+' | openssl enc -d -aes-256-cbc -pbkdf2 -a -A -pass pass:"${password:=''}" -nosalt 2>/dev/null)"
+  if [[ $? -eq 0 ]]; then
+    printf '%s\n' "$output"
+  else
+    echo -n "Error"
+  fi
 }
 export -f dec
 
 function lsdec() {
-  fd -e 7z -d 1 -x \
-    bash -c '
-      password=$1
-      echo "$(dec "$2").7z -> $3"
-    ' _ "$password" {/.} {}
+  for element in ./*; do
+    local basepath="${element##*/}"
+    local extension=".${basepath##*.}"
+    if [[ -d "$basepath" ]]; then
+      extension=""
+    fi
+    local name="${basepath%.*}"
+    printf "%-50s <- %s\n" "$(dec "$name")$extension" "$basepath"
+  done
 }
 export -f lsdec
 
 function encfile() {
-  local fullname="$(basename "$1")"
-  local extension=${$2:-'.7z'}
-  local filename="${fullname%extension}"
-  local dirpath=""
-  filename="${filename%/}"
-  [[ "$1" == *"/"* ]] && dirpath="$(dirname "$fullname")/"
+  local basedir="$(dirname $1)"
+  local basepath="$(basename $1)"
+  local extension=""
+  if [[ "$basepath" == *.* && "$basepath" != .* ]]; then
+    extension=".${basepath##*.}"
+  fi
+  local name="${basepath%.*}"
+  local newname
+  newname="$(enc "$name")"
 
-  local encrypted_filename=$(enc "$base_stem")
-
-  if [[ -n "$encrypted_filename" ]]; then
-    mv -v "$1" "${dirpath}${encrypted_filename}.7z"
+  if [[ $? -eq 0 ]]; then
+    mv -v "$1" "$basedir/$newname$extension"
+  else
+    echo -n "Error"
   fi
 }
 export -f encfile
 
 function decfile() {
-  local fullname="$(basename "$1")"
-  local extension=${$2:-'.7z'}
-  local filename="${fullname%extension}"
-  local dirpath=""
-  filename="${filename%/}"
-  [[ "$1" == *"/"* ]] && dirpath="$(dirname "$fullname")/"
+  local basedir="$(dirname $1)"
+  local basepath="$(basename $1)"
+  local extension=""
+  if [[ "$basepath" == *.* && "$basepath" != .* ]]; then
+    extension=".${basepath##*.}"
+  fi
+  local name="${basepath%.*}"
+  local newname
+  newname="$(dec "$name")"
 
-  local decrypted_filename=$(dec "$base_stem")
-
-  if [[ -n "$decrypted_filename" ]]; then
-    mv -v "$1" "${dirpath}${decrypted_filename}.7z"
+  if [[ $? -eq 0 ]]; then
+    mv -v "$1" "$basedir/$newname$extension"
+  else
+    echo -n "Error"
   fi
 }
 export -f decfile
