@@ -103,6 +103,28 @@ function decfile() {
 }
 export -f decfile
 
+function utfdump() {
+  local input
+  if [[ -t 0 ]]; then
+    input="$1"
+  else
+    input="$(cat)"
+  fi
+  local stream
+  stream=$(printf "%s" "$input" | iconv -f UTF-8 -t UTF-32BE)
+  if command -v hexyl >/dev/null 2>&1; then
+    printf "%s" "$stream" | hexyl -p -g 8 | sed 's/^ *0*/U+/'
+  elif command -v xxd >/dev/null 2>&1; then
+    printf "%s" "$stream" | xxd -p -c 4 | sed 's/^0*/U+/'
+  elif command -v hexdump >/dev/null 2>&1; then
+    printf "%s" "$stream" | hexdump -v -e '1/4 "%08x\n"' | sed 's/^0*/U+/'
+  else
+    echo "utfdump: error: none of hexyl, xxd, or hexdump found" >&2
+    return 1
+  fi
+}
+export -f utfdump
+
 if command -v wezterm &> /dev/null; then
   alias icat="wezterm imgcat"
 fi
